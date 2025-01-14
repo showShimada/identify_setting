@@ -82,7 +82,7 @@ if st.button("実行"):
     plt.figure(figsize=(8,6))
     for i,p in enumerate(df_probabilities["BB"].tolist()):
         probabilities = [binom.pmf(count,START_count,p) for count in range_count]
-        plt.plot(range_count, probabilities, marker='o', label=f'設定：{i + 1}')
+        plt.plot(range_count, probabilities, label=f'設定：{i + 1}')
         probabilities.append(max_probability)
         max_probability = max(probabilities)
 
@@ -109,7 +109,7 @@ if st.button("実行"):
     plt.figure(figsize=(8,6))
     for i,p in enumerate(df_probabilities["RB"].tolist()):
         probabilities = [binom.pmf(count,START_count,p) for count in range_count]
-        plt.plot(range_count, probabilities, marker='o', label=f'設定：{i + 1}')
+        plt.plot(range_count, probabilities, label=f'設定：{i + 1}')
         probabilities.append(max_probability)
         max_probability = max(probabilities)
 
