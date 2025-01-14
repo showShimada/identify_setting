@@ -4,6 +4,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import rcParams
 from scipy.stats import binom
+from math import comb
 
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Hiragino Maru Gothic Pro', 'Yu Gothic', 'Meirio', 'Takao', 'IPAexGothic', 'IPAPGothic', 'VL PGothic', 'Noto Sans CJK JP']
@@ -40,9 +41,9 @@ START_count = st.number_input("回転数",0)
 
 # 判別パート
 if st.button("実行"):
-    """
-    # 今回の出現率
-    """
+    # """
+    # # 今回の出現率
+    # """
     try:
         BB_outcome = round(START_count/BB_count,1)
     except ZeroDivisionError:
@@ -57,7 +58,23 @@ if st.button("実行"):
         "BB確率":BB_outcome,
         "RB確率":RB_outcome
     },index=["結果"])
+    """
+    # 総合判定
+    """
     st.dataframe(df_outcome)
+
+    plt.figure(figsize=(8,6))
+    for i,(BB_p,RB_p,neither_p) in enumerate(zip(df_probabilities["BB"].tolist(), df_probabilities["RB"].tolist(), df_probabilities["ハズレ"].tolist())):
+        probabilities = [(comb(START_count, BB_count) * comb(START_count - BB_count, RB_count) *
+               (BB_p ** BB_count) * (RB_p ** RB_count) *
+               (neither_p ** (START_count - BB_count - RB_count))) 
+               for (BB_p,RB_p,neither_p) in zip(df_probabilities["BB"].tolist(), df_probabilities["RB"].tolist(), df_probabilities["ハズレ"].tolist())]
+
+    plt.pie(probabilities, labels=["1","2","3","4","5","6"], autopct="%.1f%%", startangle=90, counterclock=False, pctdistance=0.8)
+
+    plt.title("総合判定")
+    plt.legend()
+    st.pyplot(plt)
 
     """
     # BBの二項分布
