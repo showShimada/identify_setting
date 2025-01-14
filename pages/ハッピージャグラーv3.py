@@ -26,7 +26,6 @@ df_probabilities_for_display = df_probabilities_for_display.set_index("設定")
 st.dataframe(df_probabilities_for_display)
 
 df_probabilities = pd.DataFrame({
-    "設定":["1","2","3","4","5","6"],
     "BB":[flag_count/amount_flag_count for flag_count in BB_flag_counts],
     "RB":[flag_count/amount_flag_count for flag_count in RB_flag_counts],
     "ハズレ":[(amount_flag_count - BB_flag_count - RB_flag_count)/amount_flag_count for BB_flag_count,RB_flag_count in zip(BB_flag_counts,RB_flag_counts)]
@@ -53,7 +52,6 @@ if st.button("実行"):
     except ZeroDivisionError:
         RB_outcome = np.nan
 
-
     df_outcome = pd.DataFrame({
         "BB確率":BB_outcome,
         "RB確率":RB_outcome
@@ -64,16 +62,15 @@ if st.button("実行"):
     st.dataframe(df_outcome)
 
     plt.figure(figsize=(8,6))
-    for i,(BB_p,RB_p,neither_p) in enumerate(zip(df_probabilities["BB"].tolist(), df_probabilities["RB"].tolist(), df_probabilities["ハズレ"].tolist())):
-        probabilities = [(comb(START_count, BB_count) * comb(START_count - BB_count, RB_count) *
-               (BB_p ** BB_count) * (RB_p ** RB_count) *
-               (neither_p ** (START_count - BB_count - RB_count))) 
-               for (BB_p,RB_p,neither_p) in zip(df_probabilities["BB"].tolist(), df_probabilities["RB"].tolist(), df_probabilities["ハズレ"].tolist())]
-
-    plt.pie(probabilities, labels=["1","2","3","4","5","6"], autopct="%.1f%%", startangle=90, counterclock=False, pctdistance=0.8)
+    probabilities = [(comb(START_count, BB_count) * comb(START_count - BB_count, RB_count) *
+            (row.BB ** BB_count) * (row.RB ** RB_count) *
+            (row.ハズレ ** (START_count - BB_count - RB_count))) 
+            for row in df_probabilities.itertuples(index=False, name="setting")]
+    labels = [f'設定：{i}' for i in range(1, len(probabilities) +1 )]
+    plt.pie(probabilities, labels=labels, startangle=90, counterclock=False, autopct="%.1f%%", pctdistance=0.8)
 
     plt.title("総合判定")
-    plt.legend()
+    # plt.legend()
     st.pyplot(plt)
 
     """
@@ -85,7 +82,7 @@ if st.button("実行"):
     plt.figure(figsize=(8,6))
     for i,p in enumerate(df_probabilities["BB"].tolist()):
         probabilities = [binom.pmf(count,START_count,p) for count in range_count]
-        plt.plot(range_count, probabilities, marker='o', label=f'設定：{i +1}')
+        plt.plot(range_count, probabilities, marker='o', label=f'設定：{i + 1}')
         probabilities.append(max_probability)
         max_probability = max(probabilities)
 
@@ -112,7 +109,7 @@ if st.button("実行"):
     plt.figure(figsize=(8,6))
     for i,p in enumerate(df_probabilities["RB"].tolist()):
         probabilities = [binom.pmf(count,START_count,p) for count in range_count]
-        plt.plot(range_count, probabilities, marker='o', label=f'設定：{i +1}')
+        plt.plot(range_count, probabilities, marker='o', label=f'設定：{i + 1}')
         probabilities.append(max_probability)
         max_probability = max(probabilities)
 
