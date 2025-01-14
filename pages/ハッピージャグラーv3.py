@@ -1,10 +1,7 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import rcParams
-from scipy.stats import binom
-from math import comb
 import os
 import sys
 
@@ -54,15 +51,7 @@ if st.button("実行"):
     },index=["結果"])
     st.dataframe(df_outcome)
 
-    plt.figure(figsize=(8,6))
-    probabilities = [(comb(START_count, BB_count) * comb(START_count - BB_count, RB_count) *
-            (row.BB ** BB_count) * (row.RB ** RB_count) *
-            (row.ハズレ ** (START_count - BB_count - RB_count))) 
-            for row in df_probabilities.itertuples(index=False, name="setting")]
-    labels = [f'設定：{i}' for i in range(1, len(probabilities) +1 )]
-    plt.pie(probabilities, labels=labels, startangle=90, counterclock=False, autopct="%.1f%%", pctdistance=0.8)
-
-    plt.title("総合判定")
+    plt = modules.create_pie_graph_only_bonuses(BB_count,RB_count,START_count,df_probabilities)
     st.pyplot(plt)
 
     """
