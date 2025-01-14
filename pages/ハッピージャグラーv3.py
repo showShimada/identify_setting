@@ -38,7 +38,9 @@ df_probabilities = pd.DataFrame({
 """
 BB_count = st.number_input("BB回数",0)
 RB_count = st.number_input("RB回数",0)
-START_count = st.number_input("回転数",0)
+START_count = st.number_input("開始ゲーム数",0)
+END_count = st.number_input("現在ゲーム数",3000)
+game_count = END_count - START_count
 
 # 判別パート
 if st.button("実行"):
@@ -46,22 +48,23 @@ if st.button("実行"):
     # 総合判定
     """
     df_outcome = pd.DataFrame({
-        "BB確率":modules.get_outcome(START_count, BB_count),
-        "RB確率":modules.get_outcome(START_count, RB_count)
+        "ゲーム数":game_count,
+        "BB確率":modules.get_outcome(game_count, BB_count),
+        "RB確率":modules.get_outcome(game_count, RB_count)
     },index=["結果"])
     st.dataframe(df_outcome)
 
-    plt = modules.create_pie_graph_only_bonuses(BB_count,RB_count,START_count,df_probabilities)
+    plt = modules.create_pie_graph_only_bonuses(BB_count,RB_count,game_count,df_probabilities)
     st.pyplot(plt)
 
     """
     # BBの二項分布
     """
-    plt = modules.create_binom_graph("BB", BB_count, START_count, df_probabilities)
+    plt = modules.create_binom_graph("BB", BB_count, game_count, df_probabilities)
     st.pyplot(plt)
 
     """
     # RBの二項分布
     """
-    plt = modules.create_binom_graph("RB", RB_count, START_count, df_probabilities)
+    plt = modules.create_binom_graph("RB", RB_count, game_count, df_probabilities)
     st.pyplot(plt)
