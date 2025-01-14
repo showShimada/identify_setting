@@ -5,6 +5,11 @@ from matplotlib import pyplot as plt
 from matplotlib import rcParams
 from scipy.stats import binom
 from math import comb
+import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+import modules
 
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Hiragino Maru Gothic Pro', 'Yu Gothic', 'Meirio', 'Takao', 'IPAexGothic', 'IPAPGothic', 'VL PGothic', 'Noto Sans CJK JP']
@@ -40,25 +45,13 @@ START_count = st.number_input("回転数",0)
 
 # 判別パート
 if st.button("実行"):
-    # """
-    # # 今回の出現率
-    # """
-    try:
-        BB_outcome = round(START_count/BB_count,1)
-    except ZeroDivisionError:
-        BB_outcome = np.nan
-    try:
-        RB_outcome = round(START_count/RB_count,1)
-    except ZeroDivisionError:
-        RB_outcome = np.nan
-
-    df_outcome = pd.DataFrame({
-        "BB確率":BB_outcome,
-        "RB確率":RB_outcome
-    },index=["結果"])
     """
     # 総合判定
     """
+    df_outcome = pd.DataFrame({
+        "BB確率":modules.get_outcome(START_count, BB_count),
+        "RB確率":modules.get_outcome(START_count, RB_count)
+    },index=["結果"])
     st.dataframe(df_outcome)
 
     plt.figure(figsize=(8,6))
@@ -70,59 +63,16 @@ if st.button("実行"):
     plt.pie(probabilities, labels=labels, startangle=90, counterclock=False, autopct="%.1f%%", pctdistance=0.8)
 
     plt.title("総合判定")
-    # plt.legend()
     st.pyplot(plt)
 
     """
     # BBの二項分布
     """
-    range_count = range(max(0,BB_count - 5),min(START_count,BB_count + 5) + 1)
-    max_probability = 0
-
-    plt.figure(figsize=(8,6))
-    for i,p in enumerate(df_probabilities["BB"].tolist()):
-        probabilities = [binom.pmf(count,START_count,p) for count in range_count]
-        plt.plot(range_count, probabilities, label=f'設定：{i + 1}')
-        probabilities.append(max_probability)
-        max_probability = max(probabilities)
-
-    bar_values = [max_probability if count == BB_count else 0 for count in range_count]
-
-    plt.bar(range_count, bar_values, color="blue", alpha=0.5, label="今回")
-
-    plt.title("BBの二項分布")
-    plt.xlabel("BB回数")
-    plt.ylabel("確率")
-    plt.xticks(range_count)
-    plt.legend()
-    plt.grid()
-    plt.tight_layout()
-
+    plt = modules.create_binom_graph("BB", BB_count, START_count, df_probabilities)
     st.pyplot(plt)
 
     """
     # RBの二項分布
     """
-    range_count = range(max(0,RB_count - 5),min(START_count,RB_count + 5) + 1)
-    max_probability = 0
-
-    plt.figure(figsize=(8,6))
-    for i,p in enumerate(df_probabilities["RB"].tolist()):
-        probabilities = [binom.pmf(count,START_count,p) for count in range_count]
-        plt.plot(range_count, probabilities, label=f'設定：{i + 1}')
-        probabilities.append(max_probability)
-        max_probability = max(probabilities)
-
-    bar_values = [max_probability if count == RB_count else 0 for count in range_count]
-
-    plt.bar(range_count, bar_values, color="blue", alpha=0.5, label="今回")
-
-    plt.title("RBの二項分布")
-    plt.xlabel("RB回数")
-    plt.ylabel("確率")
-    plt.xticks(range_count)
-    plt.legend()
-    plt.grid()
-    plt.tight_layout()
-
+    plt = modules.create_binom_graph("RB", RB_count, START_count, df_probabilities)
     st.pyplot(plt)
