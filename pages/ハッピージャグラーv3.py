@@ -63,13 +63,16 @@ if st.button("実行"):
     # BBの二項分布
     """
     range_count = range(max(0,BB_count - 5),min(START_count,BB_count + 5) + 1)
+    max_probability = 0
 
     plt.figure(figsize=(8,6))
     for i,p in enumerate(df_probabilities["BB"].tolist()):
         probabilities = [binom.pmf(count,START_count,p) for count in range_count]
         plt.plot(range_count, probabilities, marker='o', label=f'設定：{i +1}')
-    
-    bar_values = [max(probabilities) + (max(probabilities)/10) if count == BB_count else 0 for count in range_count]
+        probabilities.append(max_probability)
+        max_probability = max(probabilities)
+
+    bar_values = [max_probability if count == BB_count else 0 for count in range_count]
 
     plt.bar(range_count, bar_values, color="blue", alpha=0.5, label="今回")
 
@@ -87,13 +90,16 @@ if st.button("実行"):
     # RBの二項分布
     """
     range_count = range(max(0,RB_count - 5),min(START_count,RB_count + 5) + 1)
+    max_probability = 0
 
     plt.figure(figsize=(8,6))
     for i,p in enumerate(df_probabilities["RB"].tolist()):
         probabilities = [binom.pmf(count,START_count,p) for count in range_count]
         plt.plot(range_count, probabilities, marker='o', label=f'設定：{i +1}')
-    
-    bar_values = [max(probabilities) + (max(probabilities)/10) if count == RB_count else 0 for count in range_count]
+        probabilities.append(max_probability)
+        max_probability = max(probabilities)
+
+    bar_values = [max_probability if count == RB_count else 0 for count in range_count]
 
     plt.bar(range_count, bar_values, color="blue", alpha=0.5, label="今回")
 
