@@ -1,13 +1,11 @@
 import streamlit as st
 import pandas as pd
-from matplotlib import pyplot as plt
 from matplotlib import rcParams
 from math import floor, ceil
 import os
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-import modules
 import content_modules
 
 rcParams['font.family'] = 'sans-serif'
