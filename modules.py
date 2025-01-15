@@ -15,8 +15,8 @@ def create_pie_graph_only_bonuses(BB_count,RB_count,game_count,df_probabilities)
     plt.title("総合判定")
     return plt
 
-def create_binom_graph(target, target_count, game_count, df_probabilities):
-    range_count = range(max(0,target_count - 5),min(game_count,target_count + 5) + 1)
+def create_binom_graph(target, target_count, game_count, df_probabilities, additional_range):
+    range_count = range(max(0,target_count - additional_range),min(game_count,target_count + additional_range) + 1)
     max_probability = 0
 
     plt.figure(figsize=(8,6))
@@ -27,13 +27,16 @@ def create_binom_graph(target, target_count, game_count, df_probabilities):
         max_probability = max(probabilities)
 
     bar_values = [max_probability if count == target_count else 0 for count in range_count]
-
     plt.bar(range_count, bar_values, color="blue", alpha=0.5, label="今回")
+
+    if target_count >= 100:
+        plt.xticks(range_count,rotation=90)
+    else:
+        plt.xticks(range_count)
 
     plt.title(target + "の二項分布")
     plt.xlabel(target + "回数")
     plt.ylabel("確率")
-    plt.xticks(range_count)
     plt.legend()
     plt.grid()
     plt.tight_layout()
