@@ -37,7 +37,7 @@ def create_pie_graph_include_grapes(BB_count,RB_count,grapes_count,game_count,df
     plt.title("総合判定")
     return plt
 
-def create_pie_graph_full(dict_inputs,game_count,cherry_sum,df_flag_counts):
+def create_pie_graph_detail_happy_v3(dict_inputs,game_count,cherry_sum,df_flag_counts):
     df_probabilities = pd.DataFrame({
         "BB_single":[(row.BB_single_flag_counts + row.BB_rare_flag_counts + floor(row.BB_cherry_flag_counts))
                 / (row.amount_flag_counts)
