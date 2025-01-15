@@ -1,14 +1,18 @@
 import numpy as np
+import pandas as pd
 from matplotlib import pyplot as plt
 from scipy.stats import binom
 from math import comb
 
-def create_pie_graph_only_bonuses(BB_count,RB_count,game_count,df_probabilities):
+def create_pie_graph_only_bonuses(BB_count,RB_count,game_count,df_flag_counts):
+    df_probabilities = pd.DataFrame({
+        "BB":[row.BB_flag_counts/row.amount_flag_counts for row in df_flag_counts.itertuples(index=False, name="setting")],
+        "RB":[row.RB_flag_counts/(row.amount_flag_counts - row.BB_flag_counts) for row in df_flag_counts.itertuples(index=False, name="setting")]    })
     plt.figure(figsize=(8,6))
-    probabilities = [(comb(game_count, BB_count) * comb(game_count - BB_count, RB_count) *
-            (row.BB ** BB_count) * (row.RB ** RB_count) *
-            (row.ハズレ ** (game_count - BB_count - RB_count))) 
-            for row in df_probabilities.itertuples(index=False, name="setting")]
+    probabilities = [
+        binom.pmf(BB_count,game_count,row.BB)
+        * binom.pmf(RB_count,game_count - BB_count,row.RB)
+        for row in df_probabilities.itertuples(index=False, name="setting")]
     labels = [f'設定：{i}' for i in range(1, len(probabilities) +1 )]
     plt.pie(probabilities, labels=labels, startangle=90, counterclock=False, autopct="%.1f%%", pctdistance=0.8)
 
