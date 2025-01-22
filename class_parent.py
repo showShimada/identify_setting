@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from scipy.stats import binom
-# from math import floor, ceil
 
 class parent:
     def __init__(self):
