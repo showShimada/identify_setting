@@ -1,7 +1,5 @@
 import streamlit as st
-# import pandas as pd
 from matplotlib import rcParams
-# from math import floor, ceil
 import os
 import sys
 
