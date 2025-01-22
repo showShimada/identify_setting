@@ -27,8 +27,8 @@ class parent:
             st.header("総合判定")
             df_outcome = pd.DataFrame({
                 "ゲーム数":self.game_count,
-                "BB確率":self.get_outcome("BB_count"),
-                "RB確率":self.get_outcome("RB_count")
+                "BB確率":self.get_outcome(self.dict_inputs["BB_count"]),
+                "RB確率":self.get_outcome(self.dict_inputs["RB_count"])
             },index=["結果"])
             st.dataframe(df_outcome)
 
@@ -36,11 +36,11 @@ class parent:
             st.pyplot(plt)
 
             st.header("BBの二項分布")
-            plt = self.create_binom_graph("BB", self.dict_inputs["BB_count"], 5)
+            plt = self.create_binom_graph("BB", self.dict_inputs["BB_count"], self.game_count, 5)
             st.pyplot(plt)
 
             st.header("RBの二項分布")
-            plt = self.create_binom_graph("RB", self.dict_inputs["RB_count"], 5)
+            plt = self.create_binom_graph("RB", self.dict_inputs["RB_count"], self.game_count, 5)
             st.pyplot(plt)
 
     def display_input_area_bonuses_and_grapes(self):
@@ -61,9 +61,9 @@ class parent:
             st.header("総合判定")
             df_outcome = pd.DataFrame({
                 "ゲーム数":self.game_count,
-                "BB確率":self.get_outcome("BB_count"),
-                "RB確率":self.get_outcome("RB_count"),
-                "ブドウ":self.get_outcome("grapes_count")
+                "BB確率":self.get_outcome(self.dict_inputs["BB_count"]),
+                "RB確率":self.get_outcome(self.dict_inputs["RB_count"]),
+                "ブドウ":self.get_outcome(self.dict_inputs["grapes_count"])
             },index=["結果"])
             st.dataframe(df_outcome)
 
@@ -71,15 +71,15 @@ class parent:
             st.pyplot(plt)
 
             st.header("BBの二項分布")
-            plt = self.create_binom_graph("BB", self.dict_inputs["BB_count"], 5)
+            plt = self.create_binom_graph("BB", self.dict_inputs["BB_count"], self.game_count, 5)
             st.pyplot(plt)
 
             st.header("RBの二項分布")
-            plt = self.create_binom_graph("RB", self.dict_inputs["RB_count"], 5)
+            plt = self.create_binom_graph("RB", self.dict_inputs["RB_count"], self.game_count, 5)
             st.pyplot(plt)
 
             st.header("ブドウの二項分布")
-            plt = self.create_binom_graph("ブドウ", self.dict_inputs["grapes_count"], 20)
+            plt = self.create_binom_graph("ブドウ", self.dict_inputs["grapes_count"], self.game_count, 20)
             st.pyplot(plt)
 
     def create_pie_graph_only_bonuses(self):
@@ -98,7 +98,7 @@ class parent:
         return plt
 
     def create_pie_graph_include_grapes(self):
-        self.df_probabilities_pie = pd.DataFrame({
+        df_probabilities_pie = pd.DataFrame({
             "BB":[row.BB_flag_counts/row.amount_flag_counts for row in self.df_flag_counts.itertuples(index=False, name="setting")],
             "RB":[row.RB_flag_counts/(row.amount_flag_counts - row.BB_flag_counts) for row in self.df_flag_counts.itertuples(index=False, name="setting")],
             "grapes":[row.grapes_flag_counts/(row.amount_flag_counts - row.BB_flag_counts - row.RB_flag_counts) for row in self.df_flag_counts.itertuples(index=False, name="setting")]
@@ -108,20 +108,20 @@ class parent:
             binom.pmf(self.dict_inputs["BB_count"],self.game_count,row.BB)
             * binom.pmf(self.dict_inputs["RB_count"],self.game_count - self.dict_inputs["BB_count"],row.RB)
             * binom.pmf(self.dict_inputs["grapes_count"],self.game_count - self.dict_inputs["BB_count"] - self.dict_inputs["RB_count"],row.grapes)
-            for row in self.df_probabilities_pie.itertuples(index=False, name="setting")]
+            for row in df_probabilities_pie.itertuples(index=False, name="setting")]
         labels = [f'設定：{i}' for i in range(1, len(probabilities) +1 )]
         plt.pie(probabilities, labels=labels, startangle=90, counterclock=False, autopct="%.1f%%", pctdistance=0.8)
 
         plt.title("総合判定")
         return plt
 
-    def create_binom_graph(self, target, target_count, additional_range):
+    def create_binom_graph(self, target, target_count, traial_count, additional_range):
         range_count = range(max(0,target_count - additional_range),min(self.game_count,target_count + additional_range) + 1)
         max_probability = 0
 
         plt.figure(figsize=(8,6))
         for i,p in enumerate(self.df_probabilities[target].tolist()):
-            probabilities = [binom.pmf(count,self.game_count,p) for count in range_count]
+            probabilities = [binom.pmf(count,traial_count,p) for count in range_count]
             plt.plot(range_count, probabilities, label=f'設定：{i + 1}')
             probabilities.append(max_probability)
             max_probability = max(probabilities)
@@ -143,9 +143,9 @@ class parent:
 
         return plt
 
-    def get_outcome(self,target):
+    def get_outcome(self,target_count):
         try:
-            outcome = round(self.game_count/self.dict_inputs[target],1)
+            outcome = round(self.game_count/target_count,1)
         except ZeroDivisionError:
             outcome = np.nan
         return outcome
